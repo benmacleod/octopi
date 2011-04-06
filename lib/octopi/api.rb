@@ -4,7 +4,7 @@ module Octopi
   # Dummy class, so AnonymousApi and AuthApi have somewhere to inherit from
   class Api
     include Self
-    attr_accessor :format, :login, :token, :trace_level, :read_only
+    attr_accessor :format, :access_token, :login, :token, :trace_level, :read_only
   end
   
   # Used for accessing the Github API anonymously
@@ -32,7 +32,11 @@ module Octopi
     end
     
     def auth_parameters
-      { :login => Api.me.login, :token => Api.me.token }
+      if Api.me.access_token # OAuth token
+        { :access_token => Api.me.access_token }
+      else
+        { :login => Api.me.login, :token => Api.me.token }
+      end
     end
   end
   
