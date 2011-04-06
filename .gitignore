@@ -3,3 +3,6 @@ doc/
 pkg/
 contrib/nothingspecial.rb
 **/*.swp
+.idea
+pmip
+
