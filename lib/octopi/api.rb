@@ -115,7 +115,7 @@ module Octopi
      get(path, params, klass,  'plain')
     end
   
-    def get(path, params = {}, klass=nil, format = :yaml)
+    def get(path, params = {}, klass=nil, format = :json)
       @@retries = 0
       begin
         submit(path, params, klass, format) do |path, params, format, query|
@@ -138,7 +138,7 @@ module Octopi
       end  
     end
   
-    def post(path, params = {}, klass=nil, format = :yaml)
+    def post(path, params = {}, klass=nil, format = :json)
       @@retries = 0
       begin
         trace "POST", "/#{format}#{path}", params
