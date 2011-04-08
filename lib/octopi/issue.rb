@@ -100,6 +100,63 @@ module Octopi
       data = Api.api.post(command_path("comment"), { :comment => comment })
       IssueComment.new(data['comment'])
     end
+
+    def open?
+      self.state == 'open'
+    end
+    def closed?
+      !self.open?
+    end
+    def has_pull_request?
+      false
+    end
+    def needs_rating?
+      self.open? and !(self.has_size? and self.has_priority?)
+    end
+    def workflow
+      if self.ignore?
+        'ignore'
+      else
+        if self.closed?
+          if self.done?
+            'done'
+          else
+            'test'
+          end
+        else
+          if self.has_pull_request?
+            'review'
+          elsif self.has_dev?
+            'begun'
+          elsif self.has_todo?
+            'todo'
+          else
+            'open'
+          end
+        end
+      end
+    end
+    # If we get called with a method name we don't know
+    # 1. If it doesn't end with a '?' check whether
+    # we have a label '<name>_XXX', and if so, return 'XXX'.
+    # Otherwise, return ''
+    # 2. If it is like 'has_<name>?' return true if there is a label
+    # beginning with '<name>'
+    # 3. If it is like '<name>?', return true if self.status == '<name>'
+    # (i.e. if we have a label 'status_<name>')
+    def method_missing(name)
+      name = name.to_s
+      if name !~ /\?$/
+        self.labels.each do |label|
+          return $' if /^#{name}_/ =~ label # return the string that follows '<name>_'
+        end
+        ''
+      elsif name =~ /^has_/
+        self.send($'[0..-2]) != ''
+      else
+        self.status == name[0..-2]
+      end
+    end
     
     private
     def prefix(command)
@@ -109,5 +166,7 @@ module Octopi
     def command_path(command)
       "#{prefix(command)}/#{number}"
     end
+
+
   end
 end
