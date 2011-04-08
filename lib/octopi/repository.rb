@@ -108,6 +108,10 @@ module Octopi
       Issue.find(:user => self.owner, :repo => self, :number => number)
     end
 
+    def pull(number)
+      Pull.find(:user => self.owner, :repo => self, :number => number)
+    end
+
     def collaborators
       property('collaborators', [self.owner, self.name].join('/')).values.flatten.map { |v| User.find(v) }
     end  
