@@ -108,6 +108,10 @@ module Octopi
       Issue.find(:user => self.owner, :repo => self, :number => number)
     end
 
+    def pulls
+      Pull.find_all(:user => owner, :repo => self)
+    end
+
     def pull(number)
       Pull.find(:user => self.owner, :repo => self, :number => number)
     end
